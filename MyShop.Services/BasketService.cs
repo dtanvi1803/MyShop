@@ -10,7 +10,7 @@ using System.Web;
 
 namespace MyShop.Services
 {
-    class BasketService : IBasketService
+    public class BasketService : IBasketService
     {
         IRepository<Product> productContext;
         IRepository<Basket> basketContext;
@@ -107,7 +107,7 @@ namespace MyShop.Services
                                    Quantity = b.Quantity,
                                    ProductName = p.Name,
                                    Image = p.Image,
-                                   Price = p.Price.ToString()
+                                   Price = p.Price
                                }
                                ).ToList();
                 return results;
