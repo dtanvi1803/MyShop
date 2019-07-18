@@ -97,9 +97,26 @@ namespace MyShop.WebUI.Tests.Controllers
             IRepository<Basket> baskets = new MockContext<Basket>();
             IRepository<Product> products = new MockContext<Product>();
 
-            products.Insert(new Product() { Id="1", Price=10.0})
+            products.Insert(new Product() { Id = "1", Price = 10.0m });
+            products.Insert(new Product() { Id = "2", Price = 5.0m });
 
+            Basket basket = new Basket();
+            basket.BasketItems.Add(new BasketItem() { ProductId = "1", Quantity = 2 });
+            basket.BasketItems.Add(new BasketItem() { ProductId = "2", Quantity = 1 });
+            baskets.Insert(basket);
+            
+            IBasketService basketService = new BasketService(products, baskets);
+
+            var controller = new BasketController(basketService);
             var httpContext = new MockHttpContext();
+            httpContext.Request.Cookies.Add(new System.Web.HttpCookie("eCommerceBasket") { Value = basket.Id });
+            controller.ControllerContext = new System.Web.Mvc.ControllerContext(httpContext, new System.Web.Routing.RouteData(), controller);
+
+
+            var result = controller.BasketSummary() as System.Web.Mvc.PartialViewResult;
+            var basketSummary = (Core.ViewModels.BasketSummaryViewModel) result.ViewData.Model;
+            Assert.AreEqual(3, basketSummary.BasketCount);
+            Assert.AreEqual(25.00m, basketSummary.BasketTotal);
         }
     }
 }
